@@ -1,21 +1,21 @@
 $host_name = "sylius.dev"
-$db_name = "sylius"
+$db_name   = "sylius"
 
 group { 'puppet': ensure => present }
 Exec { path => [ '/bin/', '/sbin/', '/usr/bin/', '/usr/sbin/' ] }
 File { owner => 0, group => 0, mode => 0644 }
 
-file { "/dev/shm/sylius":
+file { '/dev/shm/sylius':
   ensure => directory,
-  purge => true,
-  force => true,
-  owner => vagrant,
-  group => vagrant
+  purge  => true,
+  force  => true,
+  owner  => vagrant,
+  group  => vagrant,
 }
 
 file { "/var/lock/apache2":
   ensure => directory,
-  owner => vagrant
+  owner  => vagrant,
 }
 
 exec { "ApacheUserChange" :
@@ -39,7 +39,7 @@ apt::key { '4F4EA0AAE5267A6C': }
 # have a look at the PPA documentary in order to provide a proper PPA alias:
 # https://launchpad.net/~ondrej/+archive/ubuntu/php5
 apt::ppa { 'ppa:ondrej/php5':
-  require => Apt::Key['4F4EA0AAE5267A6C']
+  require => Apt::Key['4F4EA0AAE5267A6C'],
 }
 
 package { [
@@ -48,7 +48,7 @@ package { [
     'curl',
     'git-core',
     'mc',
-    'openjdk-7-jre-headless'
+    'openjdk-7-jre-headless',
   ]:
   ensure  => 'installed',
 }
@@ -66,7 +66,7 @@ apache::vhost { "${host_name}":
   serveraliases => [
     "www.${host_name}"
   ],
-  docroot       => "/var/www/sylius/web/",
+  docroot       => '/var/www/sylius/web/',
   port          => '80',
   env_variables => [
     'VAGRANT VAGRANT'
@@ -98,14 +98,14 @@ class { 'php::pear':
 }
 
 php::pecl::module { 'mongo':
-    use_package => "no",
+  use_package => "no",
 }
 
 class { 'composer':
   command_name => 'composer',
   target_dir   => '/usr/local/bin',
-  auto_update => true,
-  require => Package['php5', 'curl'],
+  auto_update  => true,
+  require      => Package['php5', 'curl'],
 }
 
 php::ini { 'php_ini_configuration':
@@ -143,10 +143,10 @@ database{ "${db_name}_test":
 }
 
 class { 'elasticsearch':
-  ensure => 'present',
-  package_url => 'https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.3.4.deb'
+  ensure      => 'present',
+  package_url => 'https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.3.4.deb',
 } ->
-service { "elasticsearch-service":
-  name => 'elasticsearch',
-  ensure => running
+service { 'elasticsearch-service':
+  name   => 'elasticsearch',
+  ensure => running,
 }
